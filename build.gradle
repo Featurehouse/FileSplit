@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+}
+
+group = 'org.featurehouse.ioutils'
+version = '1.1'
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name = 'COVID-Trump'
+        url = 'https://covid-trump.github.io/mvn/'
+    }
+}
+
+dependencies {
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    runtimeOnly 'org.slf4j:slf4j-nop:1.7.32'
+    implementation 'org.zeroturnaround:zt-zip:1.14'
+}
+
+tasks.withType(JavaCompile.class).configureEach {
+    it.options.encoding = "UTF-8"
+}
+
+java {
+    withSourcesJar()
+}

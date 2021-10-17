@@ -1,8 +1,7 @@
 package org.featurehouse.ioutils.filesplit;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,7 +108,7 @@ public class Main {
         return null;
     }
 
-    private static @Nullable File file(String string, @NotNull CodecStatus codecStatus) {
+    private static @Nullable File file(String string, @Nonnull CodecStatus codecStatus) {
         File file = new File(string);
         if (codecStatus == CodecStatus.ENCODE)
             return file.exists() ? file : null;

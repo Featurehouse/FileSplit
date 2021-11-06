@@ -1,16 +1,17 @@
 package org.featurehouse.ioutils.filesplit;
 
+import org.featurehouse.ioutils.filesplit.internal.ByteHelper;
 import org.zeroturnaround.zip.ZipUtil;
 
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.function.IntPredicate;
 
-import static org.featurehouse.ioutils.filesplit.ByteHelper.fromInt;
-import static org.featurehouse.ioutils.filesplit.ByteHelper.toInt;
+import static org.featurehouse.ioutils.filesplit.internal.ByteHelper.fromInt;
+import static org.featurehouse.ioutils.filesplit.internal.ByteHelper.toInt;
 
+@Deprecated
 public class Core {
     /**
      * @param file can be file or directory. Zip if directory.
@@ -47,7 +48,7 @@ public class Core {
             }
 
             fileOutputStream = new BufferedOutputStream(new FileOutputStream(outputOneFile));
-            fileOutputStream.write(fromInt(Main.COMMON_HEADER));
+            fileOutputStream.write(fromInt(Constants.COMMON_HEADER));
             for (int t = 0; t < maxOneFileSize - 4; ++t) {
                 int b = inputStream.read();
                 if (b < 0) break;
@@ -60,8 +61,8 @@ public class Core {
         }
         inputStream.close();
         fileOutputStream = new BufferedOutputStream(new FileOutputStream(outputDirectory.resolve("INFO.fsplitinfo").toFile()));
-        fileOutputStream.write(fromInt(Main.INFO_HEADER));                      // Magic number 4
-        fileOutputStream.write(Main.INFO_VERSION);                              // fsplitinfo version 1
+        fileOutputStream.write(fromInt(Constants.INFO_HEADER));                      // Magic number 4
+        fileOutputStream.write(Constants.INFO_VERSION);                              // fsplitinfo version 1
         fileOutputStream.write(fromInt(i));                                     // Split file 4
         ByteHelper.writeString(fileOutputStream, originFileBck.getName());    // Filename 4+*
 
@@ -83,11 +84,11 @@ public class Core {
         InputStream inputStream = new BufferedInputStream(new FileInputStream(directoryWithSlash + "INFO.fsplitinfo"));
         //Fsplitinfo fsplitinfo = ByteFileExecutorKt.infoFromStream(inputStream);
         iCache = inputStream.read(cache, 0, 4);
-        if (iCache != 4 || toInt(cache) != Main.INFO_HEADER) throw new IllegalArgumentException("Not a valid INFO file");
-        int fileSplitVersion = art(inputStream.read(), i -> i < 1);
-        if (fileSplitVersion > Main.INFO_VERSION) throw new
-                UnsupportedOperationException(String.format("INFO version too high: 0x%x. Greater than supported (0x%x).", fileSplitVersion, Main.INFO_VERSION));
-        art(inputStream.read(cache, 0, 4), i -> i != 4);
+        if (iCache != 4 || toInt(cache) != Constants.INFO_HEADER) throw new IllegalArgumentException("Not a valid INFO file");
+        int fileSplitVersion = ByteHelper.art(inputStream.read(), i -> i < 1);
+        if (fileSplitVersion > Constants.INFO_VERSION) throw new
+                UnsupportedOperationException(String.format("INFO version too high: 0x%x. Greater than supported (0x%x).", fileSplitVersion, Constants.INFO_VERSION));
+        ByteHelper.art(inputStream.read(cache, 0, 4), i -> i != 4);
         int maxFileCount = toInt(cache);
         String newFileName = ByteHelper.readString(inputStream);
 
@@ -121,7 +122,7 @@ public class Core {
             /*if (iCache2 != 4 || toInt(cache) != VersionKt.fsplitHeader) {
                 throw new InvalidFileException(iCache + ".fsplit", 0x00000002);
             }*/
-            art(inputStream.read(cache, 0, 4), i -> i != 4 || toInt(cache) != Main.COMMON_HEADER);
+            ByteHelper.art(inputStream.read(cache, 0, 4), i -> i != 4 || toInt(cache) != Constants.COMMON_HEADER);
             //cache = ByteHelper.readNBytes(inputStream, Integer.MAX_VALUE);  // SEE InputStream#readAllBytes()
             //outputStream.write(cache);
             while ((iCache2 = inputStream.read()) >= 0) {
@@ -140,16 +141,6 @@ public class Core {
         }
 
         System.out.println("Successfully decode file at " + newFile.getAbsolutePath());
-    }
-
-    /**
-     * @throws IllegalArgumentException if matches {@code con}.
-     * @return o if does not match {@code con}
-     * @param con if matches, throw {@link IllegalArgumentException}
-     */
-    static int art(int o, IntPredicate con) throws IllegalArgumentException {
-        if (con.test(o)) throw new IllegalArgumentException("Not a valid INFO file");
-        return o;
     }
 
 }

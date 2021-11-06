@@ -6,13 +6,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Deprecated
 public class Main {
-    public static final String VERSION = "0.2.0";
-
-    public static final int COMMON_HEADER = 0x49a73b19;
-    public static final int INFO_HEADER = 0x49a73b1a;
-    public static final byte INFO_VERSION = 2;
-
     /**
      * [0]: enum {encode, decode} <br>
      * [1]: filename <br>
@@ -68,7 +63,7 @@ public class Main {
     protected static final int FILE_SIZE_DEFAULT = 98566144;
 
     private static void help() {
-        System.out.println("Usage: java -jar FileSplit-" + VERSION + "-.jar <encode|decode> <filename> [args]\n" +
+        System.out.println("Usage: java -jar FileSplit-" + Constants.VERSION + "-.jar <encode|decode> <filename> [args]\n" +
                 "encode: arg: filename\n" +
                 "decode: arg: directory name\n" +
                 "more args:\n [max_one_file_size] default 99.4MB\n" +

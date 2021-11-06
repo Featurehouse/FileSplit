@@ -1,5 +1,6 @@
 package org.featurehouse.ioutils.filesplit;
 
+@Deprecated
 public enum CodecStatus {
     ENCODE("file"),
     DECODE("directory");

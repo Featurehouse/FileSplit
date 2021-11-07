@@ -21,8 +21,18 @@ public class ConsoleApp {
             default:
                 help();
                 return;
-        } runnable.run();
-        System.out.printf("Process finished in %.2fms.\n", (System.nanoTime() - l) / 1e6);
+        }
+        String s3 = "";
+        try {
+            runnable.run();
+        } catch (Throwable t) {
+            s3 = "un";
+            System.err.println("An exception occurred while processing: "+ t);
+        } finally {
+            System.out.printf("Process finished %2$s" +
+                    "successfully in %1$.2fms.\n", (System.nanoTime() - l) / 1e6, s3);
+        }
+
     }
 
     static Runnable encoder(String[] args) {
@@ -71,7 +81,7 @@ public class ConsoleApp {
             }
 
         }
-        return new DecodeProcessor(source, outputRoot);
+        return DecodeProcessor.logEnabled(source, outputRoot);
     }
 
     public static long maxOneFileSize(String size) {
